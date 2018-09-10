@@ -1,0 +1,5 @@
+server:
+  port: 1680
+  contextPath: /monitor
+logging:
+  config: ./config/logback-spring.xml
