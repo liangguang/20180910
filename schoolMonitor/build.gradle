@@ -1,0 +1,186 @@
+def void forceVersion(details, group, version) {
+	if (details.requested.group == group) {
+		details.useVersion version
+	}
+}
+
+def void forceVersion(details, group, name, version) {
+	if (details.requested.group == group && details.requested.name == name) {
+		details.useVersion version
+	}
+}
+
+allprojects { p ->
+	// 时间戳：年月日时分
+	p.ext.Timestamp = new Date().format('yyyyMMddHHmm')
+	// Build Number
+	p.ext.BuildNumber = System.env.BUILD_NUMBER
+	if (p.ext.BuildNumber == null || "" == p.ext.BuildNumber) {
+		p.ext.BuildNumber = 'x'
+	}	
+
+	p.ext.version = '2.0.0'
+	
+	group = 'com.lgp.monitor.Application'
+	if (System.env.releaseVersion) {
+		version = p.ext.version
+	} else {
+		version = p.ext.version + '-SNAPSHOT'
+	}
+	
+	
+	apply plugin: 'java'
+	apply plugin: 'maven'
+	
+	[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+	jar.doFirst {
+		manifest {
+			def manifestFile = "${projectDir}/META-INF/MANIFEST.MF"
+			if (new File(manifestFile).exists())
+				from (manifestFile)
+			
+			attributes 'Implementation-Title':p.name
+			if (p.version.endsWith('-SNAPSHOT')) {
+				attributes 'Implementation-Version': p.version + '-' + p.ext.Timestamp
+			} else {
+				attributes 'Implementation-Version': p.version
+			}
+			attributes 'Implementation-BuildDateTime':new Date()
+		}
+	}
+	
+	javadoc {
+		options {
+			encoding 'UTF-8'
+			charSet 'UTF-8'
+			author false
+			version true
+			links 'http://docs.oracle.com/javase/8/docs/api/index.html'
+			memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PRIVATE
+		}
+	}
+
+	buildscript {
+		repositories {
+			mavenCentral()
+		}
+		dependencies {classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.14.RELEASE' }
+	}
+	
+	afterEvaluate {Project  project -> 
+		if (project.pluginManager.hasPlugin('java')) {
+			configurations.all {
+				resolutionStrategy.eachDependency {DependencyResolveDetails details -> 
+					forceVersion details, 'org.springframework.boot', '1.5.14.RELEASE'
+					forceVersion details, 'org.slf4j', '1.7.21'
+					forceVersion details, 'org.springframework', '4.3.3.RELEASE'
+				}
+
+				exclude module:'slf4j-log4j12'
+				exclude module:'log4j'
+			}
+
+			dependencies {testCompile 'junit:junit:4.12' }
+		}
+	}
+
+	repositories {
+		mavenCentral()
+	}
+	
+	// 时间戳：年月日时分
+	p.ext.Timestamp = new Date().format('yyyyMMddHHmm')
+	// Build Number
+	p.ext.BuildNumber = System.env.BUILD_NUMBER
+	if (p.ext.BuildNumber == null || "" == p.ext.BuildNumber) {
+		p.ext.BuildNumber = 'x'
+	}	
+}
+
+task zipSources(type: Zip) {
+	description '压缩源代码'
+	project.ext.zipSourcesFile = project.name + '-' + project.version + '-' +  project.ext.Timestamp + '.' + project.ext.BuildNumber + '-sources.zip' 
+	archiveName = project.ext.zipSourcesFile
+	includeEmptyDirs = false
+	
+	from project.projectDir
+	
+	exclude '**/.*'
+	exclude 'build/*'
+	allprojects.each { p ->
+		exclude '**/' + p.name + '/bin/*'
+		exclude '**/' + p.name + '/build/*'
+		exclude '**/' + p.name + '/data/*'
+		exclude '**/' + p.name + '/work/*'
+		exclude '**/' + p.name + '/logs/*'	
+	}
+}
+
+
+def CopySpec appCopySpec(Project prj, dstname = null) {
+	if (!dstname) { dstname = prj.name }
+	return copySpec{
+		// Fat jar
+		from (prj.buildDir.toString() + '/libs/' + prj.name + '-' + project.version + '.jar') {
+			into dstname
+		}		
+	
+		// Configs
+		from (prj.projectDir.toString() + '/config/examples') {
+			into dstname + '/config'
+		}
+	
+		// Windows start script
+		from (prj.projectDir.toString() + '/' + prj.name + '.bat') {
+			into dstname
+		}
+		
+		// Unix conf script
+		from (prj.projectDir.toString() + '/' + prj.name + '.conf') {
+			into dstname
+			rename prj.name, prj.name + '-' + project.version
+		}
+	}	
+}
+
+task zipSetup(type: Zip, dependsOn: subprojects.build) { 
+	description '制作安装包' 
+	project.ext.zipSetupFile = project.name + '-' + project.version + '-' +  project.ext.Timestamp + '.' + project.ext.BuildNumber + '-setup.zip' 
+	archiveName = project.name + '-' + project.version + '-' +  project.ext.Timestamp + '.' + project.ext.BuildNumber + '-setup.zip'
+
+	with appCopySpec(project(':monitor-main'))
+}
+
+import java.security.MessageDigest
+
+def generateMD5(final file) {
+	MessageDigest digest = MessageDigest.getInstance("MD5")
+	file.withInputStream(){is->
+		byte[] buffer = new byte[8192]
+		int read = 0
+		while( (read = is.read(buffer)) > 0) {
+			digest.update(buffer, 0, read);
+		}
+	}
+	byte[] md5sum = digest.digest()
+	BigInteger bigInt = new BigInteger(1, md5sum)
+	return bigInt.toString(16)
+}
+
+task md5(dependsOn: [zipSetup, zipSources]) << {
+	String md5_setup = generateMD5(file("${projectDir}/build/distributions/" + project.ext.zipSetupFile));
+	String md5_sources = generateMD5(file("${projectDir}/build/distributions/" + project.ext.zipSourcesFile));
+	println project.ext.zipSetupFile + '=' + md5_setup
+	println project.ext.zipSourcesFile + '=' + md5_sources
+	
+	def newFile = new File("${projectDir}/build/distributions/" 
+					+ project.name + '-' + project.version + '-' +  project.ext.Timestamp + '.' + project.ext.BuildNumber + '-md5.txt')
+	PrintWriter printWriter = newFile.newPrintWriter()
+	printWriter.println project.ext.zipSetupFile + '=' + md5_setup
+	printWriter.println project.ext.zipSourcesFile + '=' + md5_sources
+	printWriter.flush()
+	printWriter.close()
+}
+
+build.dependsOn subprojects.build, zipSetup, zipSources, md5
