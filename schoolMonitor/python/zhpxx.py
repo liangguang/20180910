@@ -63,12 +63,17 @@ class ZhaoPin():
 
     def download(self, url, path):
         print(url)
-        html = urllib.request.urlopen(url).read()
-        with open(r'' + path, 'wb') as file:
+        try:
+           html = urllib.request.urlopen(url).read()
+           with open(r'' + path, 'wb') as file:
               file.write(html)
               file.flush()
-        self.html = html
-        print(path + '下载成功')
+           self.html = html
+        except Exception:
+           print(path+'下载失败')
+        else:
+           print(path + '下载成功')
+
     def replaceName(self, name):
         for c in r'\/:*?"<>|/':
            name = name.replace(c, '')  
