@@ -53,12 +53,13 @@ class ZhaoPin():
             #解析列表页
             soup_c = BeautifulSoup(self.html,'html.parser', from_encoding="gb18030")
             urls_c = soup_c.select('.article_body p a')
-
+            count = 0
             for item_c in urls_c:
                 if item_c.span:
+                   count = count + 1
                    url_t = item_c['href']
                    name = item_c.get_text()
-                   self.download(url_t,dir +'/'+ name +'.html')
+                   self.download(url_t,dir +'/'+ str(count) +self.replaceName(name) +'.html')
 
     def download(self, url, path):
         print(url)
@@ -68,7 +69,10 @@ class ZhaoPin():
               file.flush()
         self.html = html
         print(path + '下载成功')
-
+    def replaceName(self, name):
+        for c in r'\/:*?"<>|/':
+           name = name.replace(c, '')  
+        return name
 
 if __name__ == '__main__':
     zp = ZhaoPin()
