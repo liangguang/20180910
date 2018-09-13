@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests, json, re, os, sys, datetime,time
-import urllib.request
+import urllib
 from bs4 import BeautifulSoup
 reload(sys) 
 sys.setdefaultencoding("utf-8")
@@ -21,7 +21,7 @@ class ZhaoPin():
         self.url = 'http://www.gaoxiaojob.com/zhaopin/total/'
 
     #def show(self,h,m):
-    def show(self,h=10,m=5):
+    def show(self,h=10,m=40):
         #h表示设定的小时，m为设定的分钟
         while True:
         # 判断是否达到设定时间，例如0:00
@@ -79,7 +79,7 @@ class ZhaoPin():
     def download(self, url, path):
         print(url)
         try:
-           html = urllib.request.urlopen(url).read()
+           html = urllib.urlopen(url).read()
            with open(r'' + path, 'wb') as file:
               file.write(html)
               file.flush()
