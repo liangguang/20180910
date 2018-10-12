@@ -1,0 +1,38 @@
+apply plugin: 'spring-boot'
+apply plugin: 'application'
+
+distributions {
+    main {
+        contents {
+			from ("${projectDir}/config/examples") {
+                into "config"
+            }
+        }
+    }
+}
+
+distTar.enabled = false
+
+springBoot {
+	executable = true
+    mainClass = 'com.my.ai.Application'
+}
+
+dependencies {
+	compile 'org.springframework.boot:spring-boot-starter-web:1.4.0.RELEASE'
+	compile 'dom4j:dom4j:1.6.1'
+	compile 'commons-httpclient:commons-httpclient:3.1'
+	compileOnly 'com.h2database:h2:1.4.191'
+	compile 'javax.cache:cache-api:1.0.0'
+	compile 'org.jboss.resteasy:resteasy-jaxrs:3.0.14.Final'
+	compile 'org.jboss.resteasy:resteasy-client:3.0.14.Final'
+	// Axis
+	compile 'axis:axis:1.4'
+	
+	compile 'org.jsoup:jsoup:1.10.1'
+	
+	compile 'com.alibaba:fastjson:1.2.21'
+	
+	compile 'com.baidu.aip:java-sdk:3.2.1'
+	
+}
