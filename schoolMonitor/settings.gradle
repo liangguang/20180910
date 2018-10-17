@@ -1,4 +1,5 @@
 include  ':monitor-main'
 include ':ai-audio'
+include ':ai-translate'
 
 rootProject.name = 'schoolMonitor'
