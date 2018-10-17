@@ -1,5 +1,7 @@
 package com.my.ai;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.my.ai.translate.TransApi;
 
 public class Main {
@@ -11,8 +13,14 @@ public class Main {
     public static void main(String[] args) {
         TransApi api = new TransApi(APP_ID, SECURITY_KEY);
 
-        String query = "高度600米";
+        String query = "弄啥嘞";
         System.out.println(api.getTransResult(query, "auto", "en"));
+        String result = api.getTransResult(query, "auto", "en");
+        JSONObject json = JSONObject.parseObject(result);
+        JSONArray arrays = json.getJSONArray("trans_result");
+        json = arrays.getJSONObject(0);
+        System.out.println(json.getString("src"));
+        System.out.println(json.getString("dst"));   
     }
 
 }
