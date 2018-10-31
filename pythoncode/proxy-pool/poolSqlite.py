@@ -3,13 +3,42 @@
 import sqlite3
 import os
 
+'''
+ 其中conn对象是数据库链接对象，而对于数据库链接对象来说，具有以下操作：
 
-DB_FILE_PATH = 'history.db'
+        commit()            --事务提交
+        rollback()          --事务回滚
+        close()             --关闭一个数据库链接
+        cursor()            --创建一个游标
+
+    cu = conn.cursor()
+    这样我们就创建了一个游标对象：cu
+    在sqlite3中，所有sql语句的执行都要在游标对象的参与下完成
+    对于游标对象cu，具有以下具体操作：
+
+        execute()           --执行一条sql语句
+        executemany()       --执行多条sql语句
+        close()             --游标关闭
+        fetchone()          --从结果中取出一条记录
+        fetchmany()         --从结果中取出多条记录
+        fetchall()          --从结果中取出所有记录
+        scroll()            --游标滚动
+
+'''
+
+
+#数据库文件绝句路径
+DB_FILE_PATH = 'proxyIP.db'
+#表名称
+TABLE_NAME = 'proxy_ip'
+#是否打印sql
 SHOW_SQL = True
 
 def get_conn(path):
+
     conn = sqlite3.connect(path)
     if path:
+        #print('硬盘上面:[{}]'.format(path))
         return conn
     else:
         conn = None
@@ -182,77 +211,13 @@ def delete(conn, sql, data):
 ####            数据库操作CRUD     END
 ###############################################################
 
-
-###############################################################
-####            测试操作     START
-###############################################################
-def drop_table_test(tablename):
-    print('删除数据库表测试...')
+def deleteById(data):
     conn = get_conn(DB_FILE_PATH)
-    drop_table(conn,tablename)
-
-def charge_create_table_test():
-    charge_table_sql = 'SELECT count(*) FROM sqlite_master where name=' + '\'history_today\''
-    create_table_sql = '''CREATE TABLE `history_today` (
-                          `event` varchar(20) NOT NULL,
-                          `eventtime` varchar(20) NOT NULL,
-                          `month` varchar(20) NOT NULL,
-                          `day` varchar(20) NOT NULL,
-                          `img` varchar(200) DEFAULT NULL,
-                          `href` varchar(20) DEFAULT NULL,
-                          `content` text DEFAULT NULL,
-                          `logtime` TIMESTAMP default (datetime('now', 'localtime')),
-                           PRIMARY KEY (`event`,`eventtime`)
-                        )'''
-    conn = get_conn(DB_FILE_PATH)
-    charge_create_table(conn, create_table_sql,charge_table_sql)
-
-def save_test():
-    '''保存数据测试...'''
-    print('保存数据测试...')
-    save_sql = '''INSERT INTO student values (?, ?, ?, ?, ?, ?)'''
-    data = [(1, 'Hongten', '男', 20, '广东省广州市', '13423****62'),
-            (2, 'Tom', '男', 22, '美国旧金山', '15423****63'),
-            (3, 'Jake', '女', 18, '广东省广州市', '18823****87'),
-            (4, 'Cate', '女', 21, '广东省广州市', '14323****32')]
-    conn = get_conn(DB_FILE_PATH)
-    save(conn, save_sql, data)
-
-def fetchall_test():
-    '''查询所有数据...'''
-    print('查询所有数据...')
-    fetchall_sql = '''SELECT * FROM sqlite_master'''
-    conn = get_conn(DB_FILE_PATH)
-    fetchall(conn, fetchall_sql)
-
-def fetchone_test():
-    '''查询一条数据...'''
-    print('查询一条数据...')
-    fetchone_sql = 'SELECT * FROM student WHERE ID = ? '
-    data = 1
-    conn = get_conn(DB_FILE_PATH)
-    fetchone(conn, fetchone_sql, data)
-
-def update_test():
-    '''更新数据...'''
-    print('更新数据...')
-    update_sql = 'UPDATE student SET name = ? WHERE ID = ? '
-    data = [('HongtenAA', 1),
-            ('HongtenBB', 2),
-            ('HongtenCC', 3),
-            ('HongtenDD', 4)]
-    conn = get_conn(DB_FILE_PATH)
-    update(conn, update_sql, data)
-
-def delete_test():
-    '''删除数据...'''
-    print('删除数据...')
-    delete_sql = 'DELETE FROM student WHERE NAME = ? AND ID = ? '
-    data = [('HongtenAA', 1),
-            ('HongtenCC', 3)]
-    conn = get_conn(DB_FILE_PATH)
-    delete(conn, delete_sql, data)
-
+    cu = get_cursor(conn)
+    for d in data:
+        cu.execute('delete from proxy_ip where address = ?', d)
+        conn.commit()
+    close_all(conn, cu)
 def getById(sql,data):
     conn = get_conn(DB_FILE_PATH)
     cu = get_cursor(conn)
@@ -262,6 +227,13 @@ def getById(sql,data):
        return r[0]
     close_all(conn,cu)
 
+def getAll(sql):
+    conn = get_conn(DB_FILE_PATH)
+    cu = get_cursor(conn)
+    cu.execute(sql)
+    r = cu.fetchall()
+    return r
+    
 def saveInfo(sql,data):
     conn = get_conn(DB_FILE_PATH)
     cu = get_cursor(conn)
@@ -270,19 +242,18 @@ def saveInfo(sql,data):
     close_all(conn, cu)
 
 def init():
-    charge_create_table_test()
-
-def main():
-    init()
-    fetchall_test()
-    print('#' * 50)
-    fetchone_test()
-    print('#' * 50)
-    update_test()
-    fetchall_test()
-    print('#' * 50)
-    delete_test()
-    fetchall_test()
+    charge_table_sql = 'SELECT count(*) FROM sqlite_master where name=' + '\'proxy_ip\''
+    create_table_sql = '''CREATE TABLE `proxy_ip` (
+                          `address` varchar(20) NOT NULL,
+                          `ip` varchar(20) NOT NULL,
+                          `port` varchar(200) DEFAULT NULL,
+                          `httpType` varchar(200) DEFAULT NULL,
+                          `othertype` varchar(200) DEFAULT NULL,
+                          PRIMARY KEY (`address`)
+                        )'''
+    conn = get_conn(DB_FILE_PATH)
+    charge_create_table(conn, create_table_sql,charge_table_sql)
 
 if __name__ == '__main__':
-    main()
+    #main()
+    init()

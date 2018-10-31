@@ -19,7 +19,7 @@ class History(object):
         self.domain = ['www.lssdjt.com']
         self.base_url = 'http://www.lssdjt.com'
     def run(self):
-        for m in range(1,13):
+        for m in range(12,13):
             for d in range(1,32):
                 url = self.base_url + '/'+ str(m)+'/'+str(d)
                 response = requests.get(url, headers=self.headers)
@@ -37,6 +37,9 @@ class History(object):
                         if event.a:
                             historytime = event.a.em.get_text()
                             title = event.a.i.get_text()
+                            if(self.getOne(historytime,title) > 0):
+                               print(historytime + ':' + title + '已存在')
+                               continue
                             event_url = event.a['href']
                             event_img = event.a.get('rel')
                             if not event_img:
@@ -57,18 +60,27 @@ class History(object):
                             if not content:
                                 content = ''
                             else:
-                                content = content[0]
-                            #print(content.get_text())
+                                content = content[0].get_text()
+                            #print(content)
                             insertsql = 'insert into history_today (`event`,`eventtime`, `month`, `day`,`img`,`href`,`content`) values (?,?,?,?,?,?,?)'
-                            data = (title,historytime,str(m),str(d),event_img,url,content.get_text())
+                            data = (title,historytime,str(m),str(d),event_img,url,content)
                             historySqlite.saveInfo(insertsql,data)
                         else:
                             historytime = event.em.get_text()
                             title = event.i.get_text()
+                            if(self.getOne(historytime,title) > 0):
+                                print(title + '已存在')
+                                continue
                             insertsql = 'insert into history_today (`event`,`eventtime`, `month`, `day`) values (?,?,?,?)'
                             data = (title,historytime,str(m),str(d))
                             historySqlite.saveInfo(insertsql,data)
-
+   
+    def getOne(self,eventtime,event):
+        #查询记录
+        querysql = 'select count(*) from history_today where eventtime = ? and event= ?'
+        data = (eventtime,event)
+        return historySqlite.getById(querysql,data)      
+        
 
 if __name__ == '__main__':
     history = History()

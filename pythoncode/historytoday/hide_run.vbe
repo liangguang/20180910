@@ -1,0 +1,10 @@
+:: DIM objShell set objShell=wscript.createObject("wscript.shell") 
+:: iReturn=objShell.Run("cmd.exe /C c:\1.bat", 0, TRUE) 　　
+::（其中win.bat为你自己的批处理名字，自己改）
+:: 然后把这个记事本保存为后缀名为.vbe的文件，到时候你只要运行这个vbe文件就达到目的了！
+:: 可以写的简单点： 
+:: Set ws = CreateObject("Wscript.Shell") 
+:: ws.run "cmd /c c:\1.bat",0 
+:: 或者 
+CreateObject("WScript.Shell").Run "cmd 1.bat",0 
+:: （这种写法很多杀软报毒， 需要替换参数0） 

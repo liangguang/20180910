@@ -7,7 +7,7 @@ data = 0
 
 def func(sleeptime):
     global data
-    print threading.currentThread().getName()
+    print(threading.currentThread().getName())
     time.sleep(sleeptime)
 threads = []
 

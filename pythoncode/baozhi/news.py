@@ -86,9 +86,10 @@ def getNBCNews():
 
 			text = article.get_text()
 			#print(len(text))
-			result = bdfy.translate(text)
-			dst = result['trans_result'][0].get('dst')
-			print('原文',text,'译文',dst)
+			#result = bdfy.translate(text)
+			dst = ''
+			#dst = result['trans_result'][0].get('dst')
+			#print('原文',text,'译文',dst)
 			SendMail.mail(SendMail,img_url,text+ '\n' +dst,imgpath)
 
 
@@ -144,22 +145,22 @@ def getHollywoodNews():
 				
 				result = bdfy.translate(title)
 				title_dst = result['trans_result'][0].get('dst')
-				#print('原文',title,'译文',title_dst)	
+				print('原文',title,'译文',title_dst)	
 				result = bdfy.translate(deck)
 				deck_dst = result['trans_result'][0].get('dst')
-				#print('原文',deck,'译文',deck_dst)
+				print('原文',deck,'译文',deck_dst)
 
 				srcText = ''
 				dstText = ''
 				ps = text.select('p')
 				for p in ps:
-					if len(p.get_text()) < 10:
-						continue
-					result = bdfy.translate(p.get_text().replace('\n',''))
+					#if len(p.get_text()) < 10:
+					#	continue
+					#result = bdfy.translate(p.get_text().replace('\n',''))
 					#print(result)
-					dstText = result['trans_result'][0].get('dst')
+					#dstText = result['trans_result'][0].get('dst')
 					srcText += p.get_text().replace('\n','')
-					dstText += dstText
+					#dstText += dstText
 
 				img_url = soup.find('figure').find('img')
 				imgpath = None
@@ -229,20 +230,20 @@ def getKorNews():
 			title_dst = result['trans_result'][0].get('dst')
 			#print('原文',title,'译文',title_dst)	
 			srcText = text.get_text().strip().replace('\n','')
-					
-			if len(srcText) > 1000:
-				nowText = srcText
-				dstText = ''
-				while len(nowText) > 1000:
-					result = bdfy.translateOther(nowText[0:1000],'kor','zh')
-					dstText += result['trans_result'][0].get('dst')
-					nowText = nowText[1000:]
-				result = bdfy.translateOther(nowText[len(srcText)/1000 * 1000 :],'kor','zh')
-				dstText += result['trans_result'][0].get('dst')
+			dstText = ''		
+			#if len(srcText) > 1000:
+				#nowText = srcText
+				#dstText = ''
+				#while len(nowText) > 1000:
+				#	result = bdfy.translateOther(nowText[0:1000],'kor','zh')
+				#	dstText += result['trans_result'][0].get('dst')
+				#	nowText = nowText[1000:]
+				#result = bdfy.translateOther(nowText[len(srcText)/1000 * 1000 :],'kor','zh')
+				#dstText += result['trans_result'][0].get('dst')
 				
-			else:	
-				result = bdfy.translateOther(srcText,'kor','zh')
-				dstText = result['trans_result'][0].get('dst')
+			#else:	
+			#	result = bdfy.translateOther(srcText,'kor','zh')
+			#	dstText = result['trans_result'][0].get('dst')
 
 			img_url = text.find('img')
 			imgpath = None
@@ -272,12 +273,14 @@ def kortask():
     threading.Thread(target=getKorNews).start()
 
 def run():
-	schedule.every().day.at("14:15").do(nbctask)
-	schedule.every().day.at("14:20").do(hollywoodtask)
-	schedule.every().day.at("14:25").do(kortask)
+	schedule.every().day.at("13:02").do(nbctask)
+	schedule.every().day.at("13:04").do(hollywoodtask)
+	schedule.every().day.at("13:06").do(kortask)
 	while True:
 		schedule.run_pending()
 		time.sleep(1)
 
 if __name__ == '__main__':	
-	run()
+	#run()
+	getKorNews()
+	

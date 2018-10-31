@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests, json, re, os, sys, datetime,time
-import traceback
+import traceback,random
 import tianqiSqlite
 from urllib.parse import urlparse
 from contextlib import closing
@@ -20,6 +20,7 @@ class Tianqi(object):
         }
         self.domain = ['www.tianqihoubao.com']
         self.base_url = 'http://tianqihoubao.com'
+        self.proxies = {}
 
     def run(self):
         self.getHtml(self.base_url,None)
@@ -47,7 +48,7 @@ class Tianqi(object):
             c_num = 0
             for city in citys:
                 c_num = c_num + 1 
-                if p_num == 1 and c_num < 9:
+                if  p_num < 24 or p_num == 24 and c_num < 5:
                     continue
                 c_name = city.a.get_text()
                 print('开始查询:'+ p_name + '|' + c_name + '天气信息')
@@ -97,24 +98,64 @@ class Tianqi(object):
         else:
            print(path + '下载成功')
 
-    def getHtml(self,url,encoding):
-        response = requests.get(url, headers=self.headers)
-        if not response.status_code == 200:
-           print('请求失败,地址有误'+url)
-           return False
-        #print('请求地址:' + url)
-        response.encoding = encoding
-        if not encoding:
-            response.encoding = 'gb2312'
-        self.html = response.text
-        return response.text
+    def getHtml(self,url,encoding):   
+        while True:
+            try:
+                #self.getProxyId()
+                response = requests.get(url, headers=self.headers,proxies=self.proxies)
+                if response.status_code == 200:
+                    response.encoding = encoding
+                    if not encoding:
+                        response.encoding = 'gb2312'
+                    self.html = response.text
+                    break
+            except Exception:
+                print('请求失败,地址有误'+url)
+            
 
     def getOne(self,province,city,rq):
         #查询记录
         querysql = 'select count(*) from history_tianqi where province = ? and city= ? and t_time = ?'
         data = (province,city,rq)
         return tianqiSqlite.getById(querysql,data)        
-
+     
+    
+    def get_ip_list(self,url, headers):
+        web_data = requests.get(url, headers=headers)
+        soup = BeautifulSoup(web_data.text, 'lxml')
+        ips = soup.find_all('tr')
+        ip_list = []
+        for i in range(1, len(ips)):
+            ip_info = ips[i]
+            tds = ip_info.find_all('td')
+            ip_list.append(tds[1].text + ':' + tds[2].text)
+        return ip_list
+    
+    def get_random_ip(self,ip_list):
+        proxy_list = []
+        for ip in ip_list:
+            proxy_list.append('http://' + ip)
+        proxy_ip = random.choice(proxy_list)
+        proxies = {'http': proxy_ip}
+        #print(proxies)
+        return proxies
+    
+    def getProxyId(self):
+        proxy_url = 'http://www.xicidaili.com/nt/'
+        proxy_headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
+        }
+        ip_list = self.get_ip_list(proxy_url, headers=proxy_headers)
+        while True:
+            try:
+                self.proxies = self.get_random_ip(ip_list)
+                response = requests.get('http://ldzl.people.com.cn/dfzlk/front/firstPage.htm', headers=self.headers, proxies=self.proxies)
+                if response.status_code == 200:
+                    print(self.proxies)
+                    print('可用')
+                    break
+            except:
+                print(str(self.proxies) + '不可用,继续下一个')
 
 if __name__ == '__main__':
     history = Tianqi()
