@@ -29,6 +29,8 @@ dependencies {
 	// Axis
 	compile 'axis:axis:1.4'
 	
+	compile 'org.seleniumhq.selenium:selenium-java:2.53.0'
+	
 	compile 'org.jsoup:jsoup:1.10.1'
 	
 	compile 'com.alibaba:fastjson:1.2.21'
