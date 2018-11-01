@@ -1,5 +1,7 @@
 package com.my.ai.selenium;
 
+import java.util.Random;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -31,12 +33,12 @@ public class BaiduSpider {
 	
 	public void openPhantom() throws Throwable{
 		WebDriver driver = PhantomUtils.getPhantomJs();
-		for (String url : urls) {
-			driver.get(url);
-			Thread.sleep( 5 * 1000L);
-			System.out.println(driver.getTitle());
-			System.out.println(driver.getCurrentUrl());
-		}
+		for (int i=0; i<10; i++) {
+			for (String url : urls) {
+				driver.get(url);
+				Thread.sleep( new Random().nextInt(10) * 1000L);
+			}	
+		}	
 		driver.quit();
 	}
 	
@@ -48,6 +50,6 @@ public class BaiduSpider {
 	}
 	
 	public static void main(String[] args) throws Throwable{
-		new BaiduSpider().open();
+		new BaiduSpider().openPhantom();
 	}
 }
