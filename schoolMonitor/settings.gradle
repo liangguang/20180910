@@ -1,6 +1,6 @@
-include  ':monitor-main'
-include ':ai-audio'
-include ':ai-translate'
-include ':ai-image'
+include ':monitor-main',
+		':ai-audio',
+		':ai-translate',
+		':ai-image'
 
 rootProject.name = 'schoolMonitor'
