@@ -10,25 +10,10 @@ def void forceVersion(details, group, name, version) {
 	}
 }
 
-allprojects { p ->
-	// 时间戳：年月日时分
-	p.ext.Timestamp = new Date().format('yyyyMMddHHmm')
-	// Build Number
-	p.ext.BuildNumber = System.env.BUILD_NUMBER
-	if (p.ext.BuildNumber == null || "" == p.ext.BuildNumber) {
-		p.ext.BuildNumber = 'x'
-	}	
 
-	p.ext.version = '2.0.0'
-	
+allprojects { p ->
 	group = 'com.lgp.monitor.Application'
-	if (System.env.releaseVersion) {
-		version = p.ext.version
-	} else {
-		version = p.ext.version + '-SNAPSHOT'
-	}
-	
-	
+	version = '1.0.0-SNAPSHOT'
 	apply plugin: 'java'
 	apply plugin: 'maven'
 	
