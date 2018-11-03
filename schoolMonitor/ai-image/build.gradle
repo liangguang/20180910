@@ -42,6 +42,6 @@ dependencies {
 	
 	compile 'com.alibaba:fastjson:1.2.21'
 	
-	compile 'com.baidu.aip:java-sdk:4.2.0'
+	compile 'com.baidu.aip:java-sdk:4.7.0'
 	
 }

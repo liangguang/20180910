@@ -34,10 +34,13 @@ public class BaiduSpider {
 	public void openPhantom() throws Throwable{
 		WebDriver driver = PhantomUtils.getPhantomJs();
 		for (int i=0; i < 1000; i++) {
+			System.out.println("当前计数:"+i);
 			for (String url : urls) {
 				driver.get(url);
+				System.out.println("当前URL:" + url);
 				Thread.sleep( new Random().nextInt(10) * 1000L);
-			}	
+			}
+			
 		}	
 		driver.quit();
 	}
