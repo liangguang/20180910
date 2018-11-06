@@ -18,7 +18,7 @@ public class ImageDetectFace {
     public static final String SECRET_KEY = "esXQzKa2eGEpuNwlh82hdRcArsIMQptb";
 
     public static void main(String[] args) {
-    	String folder = "E:\\迅雷下载\\云盘图片\\pexels-gzh";
+    	String folder = "E:\\迅雷下载\\云盘图片\\poco-gzh-33528";
     	faceBeautyCategory(folder);
     }
     
@@ -31,6 +31,10 @@ public class ImageDetectFace {
     		}else {
     			try {
 	            	JSONObject jsonObject = face(file.getAbsolutePath());
+	            	if(jsonObject.get("result") == null) {
+	            		//无人脸
+	            		continue;
+	            	}
 	            	jsonObject = jsonObject.getJSONObject("result");
 	            	JSONArray array = jsonObject.getJSONArray("face_list");
 	            	int len = array.length();
@@ -57,11 +61,16 @@ public class ImageDetectFace {
 	            		Files.move(Paths.get(file.getAbsolutePath()), Paths.get(folder.getParent(), "00",filename));
 	            	}
 	            	
-	            	Thread.sleep(1500);
+	            	
 				} catch (Throwable e) {
 					System.out.println(e.getMessage());
 				}
-            	
+    			try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             	
     		}
 		} 
@@ -79,7 +88,7 @@ public class ImageDetectFace {
         options.put("face_field", "age,beauty,gender,face_type");
         // 调用接口
         JSONObject res = client.detect( Base64Utils.picToBase64(path, false),"BASE64",options);
-        System.out.println(res.toString(2));
+        //System.out.println(res.toString(2));
         return res;
     }
     

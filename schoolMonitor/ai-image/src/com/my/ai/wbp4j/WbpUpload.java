@@ -41,17 +41,17 @@ public class WbpUpload {
      * @return ImageInfo
      * @throws IOException
      */
-    public List<ImageInfo> uploadFolder(String folder) {
+    public List<ImageInfo> uploadFolder(String folder,String recordFile) {
     	File dir = new File(folder);
     	if(dir.exists()) {
     		File[] files = dir.listFiles();
     		for (File file : files) {
 				if(file.isDirectory()) {
-					uploadFolder(file.getAbsolutePath());
+					uploadFolder(recordFile,file.getAbsolutePath());
 				}else {
 					try {
 						ImageInfo image= upload(file);
-						FileUtil.fileWriter("E:\\迅雷下载\\云盘图片\\ivsky.txt", image.getLarge(), true);
+						FileUtil.fileWriter(recordFile, image.getLarge()+"\n", true);
 						images.add(image);
 						uploadSuccessNum++;
 					} catch (Throwable e) {
