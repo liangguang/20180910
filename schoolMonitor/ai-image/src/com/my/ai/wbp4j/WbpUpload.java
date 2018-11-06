@@ -41,19 +41,22 @@ public class WbpUpload {
      * @return ImageInfo
      * @throws IOException
      */
-    public List<ImageInfo> uploadFolder(String folder,String recordFile) {
+    public List<ImageInfo> uploadFolder(String folder,String recordFile,boolean del) {
     	File dir = new File(folder);
     	if(dir.exists()) {
     		File[] files = dir.listFiles();
     		for (File file : files) {
 				if(file.isDirectory()) {
-					uploadFolder(recordFile,file.getAbsolutePath());
+					uploadFolder(file.getAbsolutePath(),recordFile,del);
 				}else {
 					try {
 						ImageInfo image= upload(file);
 						FileUtil.fileWriter(recordFile, image.getLarge()+"\n", true);
 						images.add(image);
 						uploadSuccessNum++;
+						if(del) {
+							file.delete();
+						}
 					} catch (Throwable e) {
 						logger.error("圖片"+file+"上傳失敗{}"+e.getMessage(),e);
 						uploadFailNum++;

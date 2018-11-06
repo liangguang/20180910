@@ -1,0 +1,5 @@
+server:
+  port: 8088
+  contextPath: /spider
+logging:
+  config: ./config/logback-spring.xml

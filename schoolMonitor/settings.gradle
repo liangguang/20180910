@@ -1,6 +1,7 @@
 include ':monitor-main',
 		':ai-audio',
 		':ai-translate',
-		':ai-image'
+		':ai-image',
+		':common'
 
 rootProject.name = 'schoolMonitor'
