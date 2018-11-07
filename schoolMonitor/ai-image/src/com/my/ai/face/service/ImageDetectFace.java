@@ -18,7 +18,7 @@ public class ImageDetectFace {
     public static final String SECRET_KEY = "esXQzKa2eGEpuNwlh82hdRcArsIMQptb";
 
     public static void main(String[] args) {
-    	String folder = "E:\\迅雷下载\\云盘图片\\poco-gzh-33528";
+    	String folder = "E:\\迅雷下载\\云盘图片\\poco-gzh";
     	faceBeautyCategory(folder);
     }
     

@@ -15,7 +15,7 @@ distTar.enabled = false
 
 springBoot {
 	executable = true
-    mainClass = 'com.my.ai.Application'
+    mainClass = 'com.my.Application'
 }
 
 dependencies {

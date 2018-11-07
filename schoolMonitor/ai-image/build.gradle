@@ -44,4 +44,6 @@ dependencies {
 	
 	compile 'com.baidu.aip:java-sdk:4.7.0'
 	
+	compile(project(':common'))
+	
 }

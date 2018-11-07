@@ -21,8 +21,8 @@ public class WbTuChan {
 			String folder_l = folder + i;
 			up.uploadFolder(folder_l);
 		}*/
-		String recordFile = "E:\\迅雷下载\\云盘图片\\poco-50-70.txt";
-		up.uploadFolder("E:\\迅雷下载\\云盘图片\\50",recordFile,true);
+		String recordFile = "E:\\迅雷下载\\云盘图片\\poco-noface.txt";
+		up.uploadFolder("E:\\迅雷下载\\云盘图片\\poco-gzh",recordFile,true);
 		System.out.println("耗時"+ (System.currentTimeMillis() - start) / 1000 + "秒");
 		
 	}

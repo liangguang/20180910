@@ -50,13 +50,31 @@ public class WbpUpload {
 					uploadFolder(file.getAbsolutePath(),recordFile,del);
 				}else {
 					try {
-						ImageInfo image= upload(file);
-						FileUtil.fileWriter(recordFile, image.getLarge()+"\n", true);
-						images.add(image);
-						uploadSuccessNum++;
-						if(del) {
-							file.delete();
+						Thread thread = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									ImageInfo image = upload(file);
+									FileUtil.fileWriter(recordFile, image.getLarge()+"\n", true);
+									images.add(image);
+									uploadSuccessNum++;
+									if(del) {
+										file.delete();
+									}
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						});
+						int count = Thread.activeCount();
+						while (count < 20) {
+							System.out.println(count);
+							thread.start();
+							Thread.yield();
+							break;
 						}
+						thread.join();
 					} catch (Throwable e) {
 						logger.error("圖片"+file+"上傳失敗{}"+e.getMessage(),e);
 						uploadFailNum++;
@@ -71,6 +89,7 @@ public class WbpUpload {
     	}
     	return null;
     }
+    
     
     
     /**
