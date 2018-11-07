@@ -13,7 +13,7 @@ import java.nio.channels.FileChannel;
 
 public class FileReadSample {
 
-	private static final String FILE_PATH = "test.txt";
+	private static final String FILE_PATH = "G:\\studycode\\pythoncode\\最全同义词词库.txt";
 
 	/**
 	 * 以字节为单位读取文件内容
@@ -152,8 +152,6 @@ public class FileReadSample {
 	}
 
 	public static void main(String args[]) {
-		readFileByByte(FILE_PATH);
-		readFileByCharacter(FILE_PATH);
 		readFileByLine(FILE_PATH);
 	}
 }
