@@ -1,6 +1,4 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
+apply plugin: 'spring-boot'
 apply plugin: 'application'
 
 distributions {
@@ -38,5 +36,7 @@ dependencies {
 	compile 'com.alibaba:fastjson:1.2.21'
 	
 	compile 'com.baidu.aip:java-sdk:3.2.1'
+	
+	compile(project(':common'))
 	
 }

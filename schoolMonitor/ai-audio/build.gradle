@@ -35,4 +35,5 @@ dependencies {
 	
 	compile 'com.baidu.aip:java-sdk:3.2.1'
 	
+	compile(project(':common'))
 }
