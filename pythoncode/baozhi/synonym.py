@@ -88,22 +88,16 @@ def saveInfo(sql,data):
     conn = get_conn(DB_FILE_PATH)
     save(conn,sql,data)
 
-def saveUrl(url,orgin):
+def saveUrl(url,text,orgin):
     conn = get_conn(DB_FILE_PATH)
-    sql = 'insert into history_url (?,?,?)'
-    data = (url,orgin,datetime.datetime)
+    sql = 'insert into history_url values (?,?,?,?)'
+    data = (url,orgin,datetime.time)
     save(conn,sql,data)
 
 def getByUrl(url):
     sql = 'select * from history_url where href = ?'
-    conn = get_conn(DB_FILE_PATH)
-    cu = get_cursor(conn)
-    cu.execute(sql, (url,))
-    r = cu.fetchone()
-    if len(r) > 0:
-       #print(r)
-       return r
-    close_all(conn,cu)
+    return getById(sql, (url,))
+
 
 def create_url_table():
     create_table_sql = '''CREATE TABLE `history_url` (
@@ -118,7 +112,7 @@ def create_url_table():
 
 def getSynoRecord(text):
     sql = 'select * from synonym where one = ? or two = ?'
-    return getById(sql,(text,text)
+    return getById(sql,(text,text))
 
 def getById(sql,data):
     conn = get_conn(DB_FILE_PATH)
@@ -162,5 +156,6 @@ def getHtml(base_url,headers,encoding):
 
 if __name__ == '__main__':
     #getById('select * from syno where one =? or two= ?',('哀求','哀求'))
-    create_url_table()
+    #create_url_table()
     #drop_table(get_conn(DB_FILE_PATH),'history_url')
+    saveUrl('test','title','sina')

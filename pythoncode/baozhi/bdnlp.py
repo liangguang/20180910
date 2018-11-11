@@ -29,7 +29,7 @@ def translate(text):
         result = response.items
         for r in result:
             ci = r.item
-            if len(ci) = 2 or lne(ci) = 4:
+            if len(ci) == 2 or lne(ci) == 4:
                 cis.append(ci)
         return cis
     except Exception:
@@ -37,14 +37,14 @@ def translate(text):
         print('do noting')
     return cis
 
-def nplParse(title,text,imgs):
+def nplParse(text):
     cis = bdnlp.translate(text)
     #去重复
     for ci in list(set(cis)):
         record = synonym.getSynoRecord(ci)
         if not record:
             continue
-        if ci = record[0]:
+        if ci == record[0]:
             text = text.replaceAll(ci,record[1])
         else:
             text = text.replaceAll(ci,record[1])

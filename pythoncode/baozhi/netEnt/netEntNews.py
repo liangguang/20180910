@@ -17,20 +17,6 @@ headers = {
 		'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
 	}
 
-#标题 正文 图片
-def nplParse(title,text,imgs):
-    cis = bdnlp.translate(text)
-    #去重复
-    for ci in list(set(cis)):
-        record = synonym.getSynoRecord(ci)
-        if not record:
-            continue
-        if ci = record[0]:
-            text = text.replaceAll(ci,record[1])
-        else:
-            text = text.replaceAll(ci,record[1])
-    return text
-
 
 def parseUrl(newsUrl):
     print(newsUrl)
@@ -67,7 +53,7 @@ def getNewList(url):
     return result
     #print(result)
 
-if __name__ == '__main__':
+def run():
     newslist = getNewList('http://ent.163.com/special/00032IAD/ent_json.js')
     #print(len(newslist))
     #parseUrl('http://ent.163.com/18/1110/21/E09ILV7O00038FO9.html')
@@ -75,8 +61,11 @@ if __name__ == '__main__':
         if len(synonym.getByUrl(url)) > 0:
             continue
         news = parseUrl(url)
-        text = nplParse(news[1])
+        text = bdnlp.nplParse(news[1])
         SendMail.mail(SendMail,news[0],news[1] + '\n' + text,news[2])
         break
+
+if __name__ == '__main__':
+    run()
 
     
