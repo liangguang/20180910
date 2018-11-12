@@ -23,24 +23,24 @@ class SendMail():
             if not files:
                 print('没有文件')
             elif type(files) is not list:
-                att1 = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
+                att1 = MIMEText(open(files, 'rb').read(), 'base64', 'utf-8')
                 att1["Content-Type"] = 'application/octet-stream'
                 # 这里的filename可以任意写，写什么名字，邮件中显示什么名字
-                att1["Content-Disposition"] = 'attachment; filename="title.jpg"'
+                att1["Content-Disposition"] = 'attachment; filename="'+ files.split("/")[-1]+'"'
                 msg.attach(att1)
             else:
                 for file in files:
                     att1 = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
                     att1["Content-Type"] = 'application/octet-stream'
                     # 这里的filename可以任意写，写什么名字，邮件中显示什么名字
-                    att1["Content-Disposition"] = 'attachment; filename="title.jpg"'
+                    att1["Content-Disposition"] = 'attachment; filename="'+ file.split("/")[-1]+'"'
                     msg.attach(att1)
             #server=smtplib.SMTP("smtp.163.com", 25)  # 发件人邮箱中的SMTP服务器，端口是80
             server=smtplib.SMTP_SSL("smtp.exmail.qq.com", 465)  # 发件人邮箱中的SMTP服务器，端口是80
             server.login(self.my_sender, self.my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
             server.sendmail(self.my_sender,[self.my_user,],msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
             server.quit()# 关闭连接
-            print('发送成功')
+            print('发送到',self.my_user,'成功')
         except Exception:# 如果 try 中的语句没有执行
             print('发送失败\t\n')
             traceback.print_exc()

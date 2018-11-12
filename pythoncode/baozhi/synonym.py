@@ -4,7 +4,7 @@ import sqlite3
 import requests, json, re, os, sys, datetime, time, traceback , random
 from bs4 import BeautifulSoup
 
-DB_FILE_PATH = 'synonym.db'
+DB_FILE_PATH = 'G:\\studycode\\pythoncode\\baozhi\\synonym.db'
 SHOW_SQL = True
 
 def get_conn(path):
@@ -45,14 +45,14 @@ def drop_table(conn, table):
         print('the [{}] is empty or equal None!'.format(sql))
 
 def create_table(conn, sql):
-    '''创建数据库表：student'''
+    '''创建数据库表'''
     if sql is not None and sql != '':
         cu = get_cursor(conn)
         if SHOW_SQL:
             print('执行sql:[{}]'.format(sql))
         cu.execute(sql)
         conn.commit()
-        print('创建数据库表[student]成功!')
+        print('创建数据库表成功!')
         close_all(conn, cu)
     else:
         print('the [{}] is empty or equal None!'.format(sql))
@@ -64,8 +64,8 @@ def save(conn, sql, data):
         if data is not None:
             cu = get_cursor(conn)
             for d in data:
-                if SHOW_SQL:
-                    print('执行sql:[{}],参数:[{}]'.format(sql, d))
+                #if SHOW_SQL:
+                #    print('执行sql:[{}],参数:[{}]'.format(sql, d))
                 cu.execute(sql, d)
                 conn.commit()
             close_all(conn, cu)
@@ -90,8 +90,8 @@ def saveInfo(sql,data):
 
 def saveUrl(url,text,orgin):
     conn = get_conn(DB_FILE_PATH)
-    sql = 'insert into history_url values (?,?,?,?)'
-    data = (url,orgin,datetime.time)
+    sql = 'insert into history_url (href,content,orgin) values (?,?,?)'
+    data = [(url,text,orgin)]
     save(conn,sql,data)
 
 def getByUrl(url):
@@ -111,19 +111,18 @@ def create_url_table():
     create_table(conn,create_table_sql)
 
 def getSynoRecord(text):
-    sql = 'select * from synonym where one = ? or two = ?'
+    sql = 'select * from syno where one = ? or two = ?'
     return getById(sql,(text,text))
 
 def getById(sql,data):
     conn = get_conn(DB_FILE_PATH)
     cu = get_cursor(conn)
     cu.execute(sql, data)
-    print(sql)
+    #print(sql)
     r = cu.fetchone()
-    if len(r) > 0:
-       #print(r)
-       return r
+    #print(r)
     close_all(conn,cu)
+    return r
 
 def downloadImg(imgurl,path):
         if not os.path.exists(path):

@@ -19,48 +19,68 @@ headers = {
 
 
 def parseUrl(newsUrl):
-    #print(newsUrl)
-    r = synonym.getHtml(newsUrl,headers,'gb2312')
+    print(newsUrl)
+    encoding = 'utf-8'
+    if newsUrl.find('yule') > 0:
+        encoding = 'gb2312'
+        r = synonym.getHtml(newsUrl,headers,encoding)
+    else:      
+        r = synonym.getHtml(newsUrl,headers,encoding)
     soup = r[1]
     title = soup.find('title')
     title =re.sub(r'[\/:*?"<>|]', "", title.text)
     if not os.path.exists(title):
         os.makedirs(title)
-    synonym.downloadText(r[0],title + '/index.html','utf-8')
-    content = soup.find('div',id='endText')
+    synonym.downloadText(r[0],title + '/index.html',encoding)
+    if newsUrl.find('yule') > 0:
+        content = soup.find('div',id='contentText')
+    else:
+        content = soup.find('article',id='mp-editor')
     #print(content.text)
     imgs = content.select('img')
-    synonym.downloadText(content.text,title + '/src.txt','utf-8')
+    synonym.downloadText(content.text,title + '/src.txt',encoding)
     files = []
     for n in range(len(imgs)):
         url = imgs[n]['src']
-        if not url.endswith('end_ent.png'):
-            synonym.downloadImg(url, title + '/' + str(n) +'.jpg')
-            files.append(title + '/' + str(n) +'.jpg')
+        if not url.startswith('http'):
+            url = 'http:'+ url
+        synonym.downloadImg(url, title + '/' + str(n) +'.jpg')
+        files.append(title + '/' + str(n) +'.jpg')
     files.append(title + '/src.txt')
-    synonym.saveUrl(newsUrl,content.text,'163')
+    synonym.saveUrl(newsUrl,content.text,'sohu')
     return(title,content.text,files)
 
 
 
 def getNewList(url):
-    print(url)
-    r = synonym.getHtml(url,headers,'gb2312')
+    #print(url)
+    r = synonym.getHtml(url,headers,'utf-8')
     result = r[0] 
-    newList = result[result.find('ent:') + 5:-3]
-    #json.loads(newList)
-    pattern = re.compile(r'http://ent.163.com/.*?\.html')
-    result = pattern.findall(newList)
+    newList = result[result.find('item:') + 5:-1]
+    listsohu = json.loads(newList)
+    result = []
+    for s in listsohu:
+        #print(s[2])
+        result.append(s[2])
     return result
     #print(result)
 
+def getToday():
+    now = int(time.time()) 
+    #转换为其他日期格式,如:"%Y%m%d %H:%M:%S" 
+    timeStruct = time.localtime(now) 
+    strTime = time.strftime("%Y%m%d", timeStruct) 
+    #print(strTime)
+    return strTime
+
 def run():
-    
-    newslist = getNewList('http://ent.163.com/special/00032IAD/ent_json.js')
+    newslist = getNewList('http://yule.sohu.com/_scroll_newslist/%s/news.inc' %(getToday()))
     for url in newslist:
         try:
+            if url.find('picture') > 0 : #组图 or url.find('music') > 0
+                continue
             r = synonym.getByUrl(url)
-            #print(r)
+             #print(r)
             if r is not None: #没有是None
                 continue
             news = parseUrl(url)
@@ -72,8 +92,7 @@ def run():
         except:
             traceback.print_exc()
             pass
-         #break
-        
+        #break
 
 if __name__ == '__main__':
     run()
