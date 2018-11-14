@@ -13,10 +13,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.baidu.aip.nlp.AipNlp;
+import com.my.service.NplService;
+
 public class SqliteUtil {
 
 	public static void main(String[] args) throws Exception {
-		add();
+		test();
 	}
 
 	public static void add() throws ClassNotFoundException, SQLException {
@@ -93,30 +96,21 @@ public class SqliteUtil {
 
 	public static void test() throws Exception {
 		Class.forName("org.sqlite.JDBC");
-		Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+		Connection conn = DriverManager.getConnection("jdbc:sqlite:G:\\studycode\\pythoncode\\baozhi\\synonym.db");
 		Statement stat = conn.createStatement();
-		stat.executeUpdate("drop table if exists people;");
-		stat.executeUpdate("create table people (name, occupation);");
-		PreparedStatement prep = conn.prepareStatement("insert into people values (?, ?);");
-
-		prep.setString(1, "Gandhi");
-		prep.setString(2, "politics");
-		prep.addBatch();
-		prep.setString(1, "Turing");
-		prep.setString(2, "computers");
-		prep.addBatch();
-		prep.setString(1, "Wittgenstein");
-		prep.setString(2, "smartypants");
-		prep.addBatch();
-
-		conn.setAutoCommit(false);
-		prep.executeBatch();
-		conn.setAutoCommit(true);
-
-		ResultSet rs = stat.executeQuery("select * from people;");
+		ResultSet rs = stat.executeQuery("select * from syno;");
+		AipNlp client = NplService.getClient();
 		while (rs.next()) {
-			System.out.println("name = " + rs.getString("name"));
-			System.out.println("job = " + rs.getString("occupation"));
+			try {
+				String one =  rs.getString("one");
+				String two =  rs.getString("two");
+				double score = NplService.sim(client,one,two,1);
+				String content = one + "|" +two + "=" + score ;
+				System.out.println(content);
+				FileWriteTxtUtil.appendFile2("G:\\studycode\\1.txt", content);
+			} catch (Throwable e) {
+				System.err.println(e.getMessage());
+			}
 		}
 		rs.close();
 		conn.close();
