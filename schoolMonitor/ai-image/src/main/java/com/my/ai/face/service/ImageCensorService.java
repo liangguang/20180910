@@ -21,7 +21,7 @@ public class ImageCensorService {
     	int one = 0;
     	int two = 0;
     	int three = 0;
-    	File folder = new File("E:\\迅雷下载\\原始图片\\youmeitu-6146");
+    	File folder = new File("E:\\360Downloads\\文章图片\\youmeitu");
     	for( File img:folder.listFiles()) {
     		if(img.isDirectory()) {
     			continue;

@@ -37,5 +37,6 @@ dependencies {
 	compile 'com.alibaba:fastjson:1.2.21'
 	
 	compile 'com.baidu.aip:java-sdk:4.7.0'
-	
+	 
+	compile 'com.qcloud:qcloud-java-sdk:2.0.6'
 }
